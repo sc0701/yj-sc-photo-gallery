@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Gallery</title>
+    <style>
+        /* --- 기본 스타일 --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            font-family: sans-serif;
+            color: #333;
+        }
+
+        /* --- 상단 고정 컨트롤 바 --- */
+        .control-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .home-btn {
+            text-decoration: none;
+            font-size: 20px;
+            margin-right: auto;
+        }
+
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 60px;
+            text-align: center;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #555; }
+
+        .view-btn { background-color: #007bff; }
+        .view-btn:hover { background-color: #0056b3; }
+
+
+        /* --- 갤러리 컨테이너 --- */
+        .container {
+            max-width: 600px;
+            margin: 90px auto 40px;
+            padding: 40px;
+            background-color: white;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+
+        /* --- 핵심 수정: 사진 박스 초기 상태 --- */
+        .photo-wrapper {
+            /* 중요: 처음에는 아예 화면 공간을 차지하지 않도록 숨김 */
+            display: none; 
+            
+            margin-bottom: 60px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 30px;
+            
+            /* 부드럽게 나타나는 애니메이션 */
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        /* 로딩이 완료되면 자바스크립트가 이 클래스를 붙여줍니다 */
+        .photo-wrapper.loaded {
+            display: block; /* 공간 차지 */
+            animation: fadeIn Effect 0.5s forwards; /* 서서히 나타남 */
+        }
+        
+        @keyframes fadeInEffect {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gallery-list img {
+            width: 100%;
+            border-radius: 4px;
+        }
+        .gallery-list .photo-number {
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #888;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        /* --- 모드 2: 그리드 뷰 (바둑판) --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            max-width: 1000px !important;
+        }
+
+        .gallery-grid .photo-wrapper.loaded {
+            /* 그리드 모드에서도 display:block 대신 grid item으로 작동 */
+            display: block; 
+            margin-bottom: 0;
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            cursor: pointer;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .gallery-grid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s;
+        }
+        .gallery-grid img:hover { transform: scale(1.1); }
+
+        .gallery-grid .photo-number {
+            position: absolute;
+            top: 5px; left: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        /* 로딩 스피너 (선택사항) */
+        .loading-msg {
+            text-align: center;
+            color: #888;
+            margin-top: 50px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin-top: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-bar">
+        <a href="index.html" class="home-btn">🏠</a>
+        <input type="number" id="jumpInput" placeholder="No." min="1">
+        <button onclick="jumpToPhoto()">이동</button>
+        <button onclick="toggleView()" class="view-btn" id="viewBtn">田 모아보기</button>
+    </div>
+
+    <div class="container gallery-list" id="galleryContainer">
+        <div id="loadingMsg" class="loading-msg">사진을 불러오고 있습니다...</div>
+        <div id="gallery"></div>
+    </div>
+
+    <script>
+        const gallery = document.getElementById('gallery');
+        const container = document.getElementById('galleryContainer');
+        const viewBtn = document.getElementById('viewBtn');
+        const jumpInput = document.getElementById('jumpInput');
+        const loadingMsg = document.getElementById('loadingMsg');
+
+        const maxCheck = 1000;
+        const folderPath = 'images/'; // ★ 폴더명 확인
+        const defaultExtension = '.PNG'; 
+
+        // 로딩 완료된 사진 개수 체크용
+        let loadedCount = 0;
+
+        for (let i = 1; i <= maxCheck; i++) {
+            const wrapper = document.createElement('div');
+            // 'loaded' 클래스가 없으므로 CSS에 의해 화면에 안 보임 (display: none)
+            wrapper.className = 'photo-wrapper'; 
+            wrapper.id = 'photo-' + i; 
+
+            wrapper.onclick = function() {
+                if(container.classList.contains('gallery-grid')) {
+                    toggleView();
+                    setTimeout(() => jumpToSpecific(i), 100);
+                }
+            };
+            
+            const numberLabel = document.createElement('div');
+            numberLabel.className = 'photo-number';
+            numberLabel.textContent = `No. ${i}`;
+            
+            const img = document.createElement('img');
+            img.src = folderPath + i + defaultExtension;
+            img.alt = `Photo ${i}`;
+            img.loading = 'lazy';
+
+            // 1. 로딩 성공 시: 비로소 화면에 보여줌 (투명망토 해제)
+            img.onload = function() {
+                wrapper.classList.add('loaded'); // CSS display: block 발동
+                loadingMsg.style.display = 'none'; // 첫 사진이 뜨면 로딩 메시지 삭제
+                loadedCount++;
+            };
+
+            // 2. 로딩 실패 시: 조용히 삭제 (화면에 나타난 적도 없으므로 깜빡임 없음)
+            img.onerror = function() {
+                if (this.src.includes('.PNG')) {
+                    this.src = this.src.replace('.PNG', '.png');
+                } else {
+                    wrapper.remove(); // 조용히 제거
+                }
+            };
+
+            wrapper.appendChild(numberLabel);
+            wrapper.appendChild(img);
+            gallery.appendChild(wrapper);
+        }
+
+        function jumpToPhoto() {
+            jumpToSpecific(jumpInput.value);
+        }
+
+        function jumpToSpecific(num) {
+            const target = document.getElementById('photo-' + num);
+            if (target && target.classList.contains('loaded')) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                alert('해당 번호의 사진이 없거나 로딩되지 않았습니다.');
+            }
+        }
+
+        jumpInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") jumpToPhoto();
+        });
+
+        function toggleView() {
+            if (container.classList.contains('gallery-list')) {
+                // 그리드 모드
+                container.classList.remove('gallery-list');
+                container.classList.add('gallery-grid');
+                viewBtn.textContent = '≡ 크게보기';
+                gallery.className = 'gallery-grid';
+                container.style.maxWidth = '1000px';
+                container.style.padding = '20px';
+            } else {
+                // 리스트 모드
+                container.classList.remove('gallery-grid');
+                container.classList.add('gallery-list');
+                viewBtn.textContent = '田 모아보기';
+                gallery.className = '';
+                container.style.maxWidth = '600px'; 
+                container.style.padding = '40px';
+            }
+        }
+    </script>
+</body>
+</html>
