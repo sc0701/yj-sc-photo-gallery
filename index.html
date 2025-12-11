@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Photo Collections</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 화면 전체 높이 사용 */
+            text-align: center;
+        }
+
+        .menu-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        /* 버튼 스타일 */
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 15px 0;
+            margin-bottom: 15px;
+            text-decoration: none;
+            color: white;
+            background-color: #333; /* 버튼 색상 */
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s, background-color 0.2s;
+            box-sizing: border-box; /* 패딩 포함 크기 계산 */
+        }
+
+        .menu-btn:hover {
+            transform: scale(1.02); /* 마우스 올리면 살짝 커짐 */
+            background-color: #555;
+        }
+
+        /* 두 번째 버튼 색상을 다르게 하려면 (선택사항) */
+        .btn-2 {
+            background-color: #007bff; /* 파란색 */
+        }
+        .btn-2:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu-container">
+        <h1>Photo Archive</h1>
+        
+        <a href="gallery1.html" class="menu-btn">📂 첫 번째 기록 (300장)</a>
+        <a href="gallery2.html" class="menu-btn btn-2">📂 두 번째 기록 (여행/일상)</a>
+    </div>
+
+</body>
+</html>
