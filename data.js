@@ -27,13 +27,13 @@ const CONFIG = {
         { text: "불멍 때리며 글램핑하기", done: false },
         { text: "매달 인생네컷 찍기", done: false },
         { text: "유진이 곱창 머리끈 10개 사주기", done: false },   
-        { text: "유진이 곱창 머리끈 10개 사주기", done: false },   
         { text: "서로 친구들에게 소개해주기", done: false },  
         { text: "맛있는 음식 만들어 먹기", done: false }, 
         { text: "커플 아이템 맞추기", done: false }, 
     
     ]
 };
+
 
 
 
