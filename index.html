@@ -3,277 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Gallery</title>
+    <title>My Photo Collections</title>
     <style>
-        /* --- 기본 스타일 --- */
         body {
             margin: 0;
-            padding: 0; /* 헤더 때문에 상단 여백은 JS로 제어하거나 아래 container에서 처리 */
+            padding: 0;
             background-color: #f0f2f5;
             font-family: sans-serif;
-            color: #333;
-        }
-
-        /* --- 상단 고정 컨트롤 바 (네비게이션) --- */
-        .control-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 10px 20px;
             display: flex;
-            justify-content: center; /* 중앙 정렬 */
+            justify-content: center;
             align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            box-sizing: border-box;
-        }
-
-        /* 컨트롤 바 안의 요소들 */
-        .home-btn {
-            text-decoration: none;
-            font-size: 20px;
-            margin-right: auto; /* 홈 버튼은 왼쪽 끝으로 */
-        }
-
-        input[type="number"] {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 60px;
+            height: 100vh; /* 화면 전체 높이 사용 */
             text-align: center;
         }
 
-        button {
-            padding: 8px 15px;
-            background-color: #333;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        button:hover { background-color: #555; }
-
-        .view-btn {
-            background-color: #007bff; /* 파란색 버튼 */
-        }
-        .view-btn:hover { background-color: #0056b3; }
-
-
-        /* --- 갤러리 컨테이너 --- */
-        .container {
-            max-width: 800px;
-            margin: 80px auto 20px; /* 헤더 높이만큼 상단 여백(80px) */
-            padding: 20px;
-            background-color: white;
-            min-height: 100vh;
-            transition: all 0.3s ease;
-        }
-
-        /* --- 모드 1: 리스트 뷰 (기존 방식 - 세로로 쭉) --- */
-        .gallery-list .photo-wrapper {
-            margin-bottom: 50px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 20px;
-        }
-        .gallery-list img {
-            width: 100%;
-            border-radius: 4px;
-        }
-        .gallery-list .photo-number {
-            display: inline-block;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #555;
-            background: #eee;
-            padding: 5px 10px;
+        .menu-container {
+            background: white;
+            padding: 40px;
             border-radius: 15px;
-            font-size: 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
         }
 
-
-        /* --- 모드 2: 그리드 뷰 (바둑판 - 3열) --- */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 한 줄에 3개 */
-            gap: 5px; /* 사진 사이 간격 */
-            max-width: 1000px !important; /* 그리드일 땐 좀 더 넓게 */
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
         }
 
-        .gallery-grid .photo-wrapper {
-            margin-bottom: 0;
-            position: relative; /* 번호를 사진 위에 띄우기 위해 */
-            aspect-ratio: 1 / 1; /* 정사각형 비율 유지 */
-            overflow: hidden;
-            cursor: pointer;
-        }
-
-        .gallery-grid img {
+        /* 버튼 스타일 */
+        .menu-btn {
+            display: block;
             width: 100%;
-            height: 100%;
-            object-fit: cover; /* 꽉 차게 */
-            transition: transform 0.2s;
-        }
-        
-        .gallery-grid img:hover {
-            transform: scale(1.1); /* 마우스 올리면 확대 */
-        }
-
-        /* 그리드 모드일 때 번호표 스타일 변경 */
-        .gallery-grid .photo-number {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: rgba(0,0,0,0.6);
+            padding: 15px 0;
+            margin-bottom: 15px;
+            text-decoration: none;
             color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            z-index: 10;
+            background-color: #333; /* 버튼 색상 */
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s, background-color 0.2s;
+            box-sizing: border-box; /* 패딩 포함 크기 계산 */
         }
 
-        /* 검색된 사진 강조 효과 */
-        .highlight {
-            animation: flash 2s;
-            border: 4px solid red !important;
-        }
-        @keyframes flash {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 1; }
+        .menu-btn:hover {
+            transform: scale(1.02); /* 마우스 올리면 살짝 커짐 */
+            background-color: #555;
         }
 
-        /* 모바일 대응 */
-        @media (max-width: 600px) {
-            .gallery-grid {
-                grid-template-columns: repeat(3, 1fr); /* 모바일도 3열 유지 (원하면 2열로 변경 가능) */
-            }
-            .control-bar {
-                padding: 10px;
-                font-size: 14px;
-            }
-            .home-btn { font-size: 18px; }
+        /* 두 번째 버튼 색상을 다르게 하려면 (선택사항) */
+        .btn-2 {
+            background-color: #007bff; /* 파란색 */
+        }
+        .btn-2:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
-    <div class="control-bar">
-        <a href="index.html" class="home-btn">🏠</a>
+    <div class="menu-container">
+        <h1>Photo Archive</h1>
         
-        <input type="number" id="jumpInput" placeholder="No." min="1">
-        <button onclick="jumpToPhoto()">이동</button>
-
-        <button onclick="toggleView()" class="view-btn" id="viewBtn">田 모아보기</button>
+        <a href="gallery1.html" class="menu-btn">📂 우리의 첫 번째 기록</a>
+        <a href="gallery2.html" class="menu-btn btn-2">📂 우리의 두 번째 기록</a>
     </div>
 
-    <div class="container gallery-list" id="galleryContainer">
-        <div id="gallery"></div>
-    </div>
-
-    <script>
-        const gallery = document.getElementById('gallery');
-        const container = document.getElementById('galleryContainer');
-        const viewBtn = document.getElementById('viewBtn');
-        const jumpInput = document.getElementById('jumpInput');
-
-        const maxCheck = 1000;
-        const folderPath = 'images/'; // 폴더명 확인! (gallery2라면 images2/ 로 변경)
-        const defaultExtension = '.PNG'; 
-
-        // 1. 이미지 생성 반복문
-        for (let i = 1; i <= maxCheck; i++) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'photo-wrapper';
-            
-            // *** 중요: 이동을 위해 각 사진 박스에 ID 부여 (photo-1, photo-2...) ***
-            wrapper.id = 'photo-' + i; 
-
-            // 그리드 모드에서 클릭하면 크게 보기로 전환하며 해당 위치로 이동 기능 추가
-            wrapper.onclick = function() {
-                if(container.classList.contains('gallery-grid')) {
-                    toggleView(); // 리스트 뷰로 전환
-                    setTimeout(() => jumpToSpecific(i), 100); // 약간의 딜레이 후 이동
-                }
-            };
-            
-            const numberLabel = document.createElement('div');
-            numberLabel.className = 'photo-number';
-            numberLabel.textContent = i;
-            
-            const img = document.createElement('img');
-            img.src = folderPath + i + defaultExtension;
-            img.alt = `Photo ${i}`;
-            img.loading = 'lazy';
-
-            // 에러 처리 (대소문자 호환 + 파일 없으면 삭제)
-            img.onerror = function() {
-                if (this.src.includes('.PNG')) {
-                    this.src = this.src.replace('.PNG', '.png');
-                } else {
-                    wrapper.remove();
-                }
-            };
-
-            wrapper.appendChild(numberLabel);
-            wrapper.appendChild(img);
-            gallery.appendChild(wrapper);
-        }
-
-        // 2. 기능: 번호로 점프하기
-        function jumpToPhoto() {
-            const num = jumpInput.value;
-            jumpToSpecific(num);
-        }
-
-        function jumpToSpecific(num) {
-            const target = document.getElementById('photo-' + num);
-            if (target) {
-                // 부드럽게 스크롤 이동 (화면 중앙에 오도록)
-                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // 찾았다는 표시 (빨간 테두리 깜빡임 - 선택사항)
-                // target.style.border = "2px solid red"; 
-                // setTimeout(() => target.style.border = "none", 2000);
-            } else {
-                alert(num + '번 사진이 없습니다.');
-            }
-        }
-
-        // 엔터키 치면 이동
-        jumpInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                jumpToPhoto();
-            }
-        });
-
-        // 3. 기능: 뷰 모드 전환 (리스트 <-> 그리드)
-        function toggleView() {
-            // 클래스를 떼었다 붙였다 함 (gallery-list <-> gallery-grid)
-            if (container.classList.contains('gallery-list')) {
-                container.classList.remove('gallery-list');
-                container.classList.add('gallery-grid');
-                viewBtn.textContent = '≡ 크게보기';
-                
-                // 그리드 모드일 때는 갤러리 자체에 그리드 클래스 적용 필요 (구조상 wrapper 이동)
-                gallery.className = 'gallery-grid'; 
-                container.style.maxWidth = '1000px'; // 넓게 쓰기
-            } else {
-                container.classList.remove('gallery-grid');
-                container.classList.add('gallery-list');
-                viewBtn.textContent = '田 모아보기';
-                
-                gallery.className = '';
-                container.style.maxWidth = '800px';
-            }
-        }
-    </script>
 </body>
 </html>
