@@ -74,25 +74,24 @@
             border-radius: 8px;
         }
 
-        /* --- 핵심 수정: 사진 박스 초기 상태 --- */
+        /* --- [수정됨] 사진 박스 스타일 --- */
         .photo-wrapper {
-            /* 중요: 처음에는 아예 화면 공간을 차지하지 않도록 숨김 */
-            display: none; 
-            
+            /* display: none을 제거하고 opacity로 제어합니다 */
+            opacity: 0; 
             margin-bottom: 60px;
             text-align: center;
             border-bottom: 1px solid #eee;
             padding-bottom: 30px;
-            
-            /* 부드럽게 나타나는 애니메이션 */
-            opacity: 0;
             transition: opacity 0.5s ease-in;
+            
+            /* 로딩 전에도 공간을 약간 차지하게 해서 레이아웃 붕괴 방지 */
+            min-height: 100px; 
         }
 
-        /* 로딩이 완료되면 자바스크립트가 이 클래스를 붙여줍니다 */
+        /* 로딩 완료되면 나타남 */
         .photo-wrapper.loaded {
-            display: block; /* 공간 차지 */
-            animation: fadeIn Effect 0.5s forwards; /* 서서히 나타남 */
+            opacity: 1;
+            animation: fadeInEffect 0.5s forwards;
         }
         
         @keyframes fadeInEffect {
@@ -113,7 +112,7 @@
             letter-spacing: 1px;
         }
 
-        /* --- 모드 2: 그리드 뷰 (바둑판) --- */
+        /* --- 그리드 뷰 (바둑판) --- */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -121,9 +120,7 @@
             max-width: 1000px !important;
         }
 
-        .gallery-grid .photo-wrapper.loaded {
-            /* 그리드 모드에서도 display:block 대신 grid item으로 작동 */
-            display: block; 
+        .gallery-grid .photo-wrapper {
             margin-bottom: 0;
             position: relative;
             aspect-ratio: 1 / 1;
@@ -131,6 +128,7 @@
             cursor: pointer;
             border-bottom: none;
             padding-bottom: 0;
+            min-height: auto; /* 그리드에선 높이 자동 */
         }
 
         .gallery-grid img {
@@ -152,14 +150,6 @@
             z-index: 10;
         }
 
-        /* 로딩 스피너 (선택사항) */
-        .loading-msg {
-            text-align: center;
-            color: #888;
-            margin-top: 50px;
-            font-size: 14px;
-        }
-
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -178,7 +168,6 @@
     </div>
 
     <div class="container gallery-list" id="galleryContainer">
-        <div id="loadingMsg" class="loading-msg">사진을 불러오고 있습니다...</div>
         <div id="gallery"></div>
     </div>
 
@@ -187,18 +176,13 @@
         const container = document.getElementById('galleryContainer');
         const viewBtn = document.getElementById('viewBtn');
         const jumpInput = document.getElementById('jumpInput');
-        const loadingMsg = document.getElementById('loadingMsg');
 
         const maxCheck = 1000;
-        const folderPath = 'images/'; // ★ 폴더명 확인
+        const folderPath = 'images/'; // ★ 중요: 파일 경로가 맞는지 꼭 확인하세요!
         const defaultExtension = '.PNG'; 
-
-        // 로딩 완료된 사진 개수 체크용
-        let loadedCount = 0;
 
         for (let i = 1; i <= maxCheck; i++) {
             const wrapper = document.createElement('div');
-            // 'loaded' 클래스가 없으므로 CSS에 의해 화면에 안 보임 (display: none)
             wrapper.className = 'photo-wrapper'; 
             wrapper.id = 'photo-' + i; 
 
@@ -216,21 +200,23 @@
             const img = document.createElement('img');
             img.src = folderPath + i + defaultExtension;
             img.alt = `Photo ${i}`;
+            
+            // ★ 수정됨: loading="lazy"를 유지하되, CSS display 문제를 해결함
             img.loading = 'lazy';
 
-            // 1. 로딩 성공 시: 비로소 화면에 보여줌 (투명망토 해제)
+            // 1. 로딩 성공 시
             img.onload = function() {
-                wrapper.classList.add('loaded'); // CSS display: block 발동
-                loadingMsg.style.display = 'none'; // 첫 사진이 뜨면 로딩 메시지 삭제
-                loadedCount++;
+                wrapper.classList.add('loaded'); // 투명도 0 -> 1로 변경
             };
 
-            // 2. 로딩 실패 시: 조용히 삭제 (화면에 나타난 적도 없으므로 깜빡임 없음)
+            // 2. 로딩 실패 시
             img.onerror = function() {
+                // 대문자 실패하면 소문자로 재시도
                 if (this.src.includes('.PNG')) {
                     this.src = this.src.replace('.PNG', '.png');
                 } else {
-                    wrapper.remove(); // 조용히 제거
+                    // 진짜 없으면 박스 자체를 삭제 (공간 제거)
+                    wrapper.style.display = 'none'; 
                 }
             };
 
@@ -245,10 +231,10 @@
 
         function jumpToSpecific(num) {
             const target = document.getElementById('photo-' + num);
-            if (target && target.classList.contains('loaded')) {
+            if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } else {
-                alert('해당 번호의 사진이 없거나 로딩되지 않았습니다.');
+                alert('해당 번호의 사진을 찾을 수 없습니다.');
             }
         }
 
