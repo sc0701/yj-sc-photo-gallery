@@ -16,14 +16,14 @@
 
         /* 갤러리 컨테이너 */
         .container {
-            max-width: 800px; /* 최대 너비 */
-            margin: 0 auto;   /* 중앙 정렬 */
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
             background-color: white;
             min-height: 100vh;
         }
 
-        /* 헤더 스타일 (심플하게 변경) */
+        /* 헤더 */
         header {
             text-align: center;
             padding: 40px 0 20px;
@@ -39,9 +39,8 @@
 
         /* 사진 감싸는 박스 */
         .photo-wrapper {
-            margin-bottom: 50px; /* 사진 간격 */
+            margin-bottom: 50px;
             text-align: center;
-            /* 파일이 없을 경우 숨기기 위해 기본적으로 표시하되 자바스크립트로 제어 */
             display: block; 
         }
 
@@ -72,47 +71,44 @@
             <h1>My Photo Archive</h1>
         </header>
 
-        <div id="gallery">
-            </div>
+        <div id="gallery"></div>
     </div>
 
     <script>
         const gallery = document.getElementById('gallery');
-        
-        // 1. 앞으로 사진이 늘어날 것을 대비해 넉넉하게 설정합니다.
-        // 현재 300장이지만, 1000으로 설정해두면 나중에 301~1000번 파일을 올려도 자동 인식합니다.
-        const maxCheck = 1000; 
-
-        // 2. 파일 확장자 설정 (png)
-        const fileExtension = '.png'; 
+        const maxCheck = 1000; // 최대 1000번까지 체크
         const folderPath = 'images/';
+        
+        // 1. 기본 확장자를 대문자 .PNG로 설정했습니다.
+        const defaultExtension = '.PNG'; 
 
         for (let i = 1; i <= maxCheck; i++) {
-            // 래퍼(박스) 생성
             const wrapper = document.createElement('div');
             wrapper.className = 'photo-wrapper';
             
-            // 번호표 생성
             const numberLabel = document.createElement('div');
             numberLabel.className = 'photo-number';
             numberLabel.textContent = `No. ${i}`;
             
-            // 이미지 태그 생성
             const img = document.createElement('img');
             
-            // 경로 생성: images/1.png
-            img.src = folderPath + i + fileExtension;
+            // 일단 대문자 PNG로 시도합니다 (예: images/1.PNG)
+            img.src = folderPath + i + defaultExtension;
             img.alt = `Photo ${i}`;
-            img.loading = 'lazy'; // 성능 최적화
+            img.loading = 'lazy';
 
-            // *** 핵심 기능: 에러 처리 ***
-            // 이미지를 불러오려 했는데 파일이 없으면(404 에러), 
-            // 깨진 아이콘을 보여주는 대신 박스 자체를 화면에서 지워버립니다.
+            // *** 똑똑한 에러 처리 (핵심!) ***
             img.onerror = function() {
-                wrapper.remove(); 
+                // 만약 대문자(.PNG) 로딩에 실패했다면?
+                if (this.src.includes('.PNG')) {
+                    // "혹시 소문자(.png) 인가?" 하고 다시 한번 시도해봅니다.
+                    this.src = this.src.replace('.PNG', '.png');
+                } else {
+                    // 소문자(.png)까지 해봤는데도 없으면 -> 진짜 없는 파일이므로 숨깁니다.
+                    wrapper.remove();
+                }
             };
 
-            // 조립
             wrapper.appendChild(numberLabel);
             wrapper.appendChild(img);
             gallery.appendChild(wrapper);
