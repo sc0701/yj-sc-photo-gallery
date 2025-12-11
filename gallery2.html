@@ -33,16 +33,53 @@
 
         /* 사진 목록 */
         .photo-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        .photo-item { aspect-ratio: 1 / 1; background: #eee; border-radius: 4px; overflow: hidden; position: relative; display: none; } /* 처음엔 숨김 */
-        .photo-item.loaded { display: block; animation: fadeIn 0.5s forwards; } /* 로딩되면 보임 */
+        .photo-item { 
+            aspect-ratio: 1 / 1; background: #eee; border-radius: 4px; overflow: hidden; 
+            position: relative; display: none; cursor: pointer; 
+        } 
+        /* 로딩되면 보임 */
+        .photo-item.loaded { display: block; animation: fadeIn 0.5s forwards; }
         .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
         .photo-item:hover img { transform: scale(1.05); }
+
+        /* --- 모달(확대보기) 스타일 --- */
+        .modal-overlay {
+            display: none; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); 
+            z-index: 2000;
+            justify-content: center; align-items: center;
+        }
+
+        .modal-image {
+            max-width: 90%; max-height: 85vh; 
+            object-fit: contain; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            user-select: none; /* 드래그 방지 */
+        }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 30px;
+            color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 2002;
+        }
+
+        /* 화살표 버튼 */
+        .prev, .next {
+            cursor: pointer; position: absolute; top: 50%; width: auto; padding: 16px;
+            margin-top: -50px; color: white; font-weight: bold; font-size: 30px;
+            transition: 0.3s; user-select: none; z-index: 2001;
+        }
+        .next { right: 0; border-radius: 3px 0 0 3px; }
+        .prev { left: 0; border-radius: 0 3px 3px 0; }
+        .prev:hover, .next:hover { background-color: rgba(0,0,0,0.8); }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         @media (max-width: 600px) {
             .album-grid { grid-template-columns: repeat(2, 1fr); }
             .photo-grid { grid-template-columns: repeat(3, 1fr); }
+            .close-btn { top: 10px; right: 20px; font-size: 30px; }
+            .prev, .next { font-size: 20px; padding: 10px; }
         }
     </style>
 </head>
@@ -58,22 +95,32 @@
         <div class="photo-grid" id="photoList"></div>
     </div>
 
+    <div class="modal-overlay" id="imageModal">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+        <a class="next" onclick="changeSlide(1)">&#10095;</a>
+        <img src="" class="modal-image" id="modalImg">
+    </div>
+
     <script>
-        // ★ 설정: 개수(count)를 입력할 필요가 없습니다. 폴더 이름만 적으세요.
+        // ★ 설정 구역: 앨범 목록 관리
         const albums = [
             { name: "2025.12", folder: "2025.12" },
             // { name: "2026.01", folder: "2026.01" },
         ];
 
-        // ★ 설정: 앨범당 최대 몇 장까지 체크할까요? (넉넉하게 500장 설정)
         const maxCheck = 500; 
-        const basePath = "images2/";
+        const basePath = "images2/"; // 폴더명 확인
         const ext = ".png"; 
 
         const albumList = document.getElementById('albumList');
         const photoList = document.getElementById('photoList');
         const pageTitle = document.getElementById('pageTitle');
         const backBtn = document.getElementById('backBtn');
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+
+        let currentModalIndex = 0; // 현재 보고 있는 사진 번호
 
         function renderAlbums() {
             albumList.innerHTML = "";
@@ -81,7 +128,6 @@
                 const card = document.createElement('div');
                 card.className = 'album-card';
                 card.onclick = () => openAlbum(index);
-                // 개수 표시를 아예 뺐습니다. 깔끔하죠?
                 card.innerHTML = `<span class="folder-icon">📁</span><div class="album-name">${album.name}</div>`;
                 albumList.appendChild(card);
             });
@@ -95,7 +141,6 @@
             pageTitle.textContent = album.name;
             photoList.innerHTML = "";
 
-            // 무조건 1번부터 500번까지 시도합니다.
             for (let i = 1; i <= maxCheck; i++) {
                 const item = document.createElement('div');
                 item.className = 'photo-item';
@@ -104,12 +149,10 @@
                 img.src = `${basePath}${album.folder}/${i}${ext}`;
                 img.loading = 'lazy';
                 
-                // 로딩 성공하면: 박스를 보여줌 (loaded 클래스 추가)
                 img.onload = function() {
-                    item.classList.add('loaded');
+                    item.classList.add('loaded'); // 로딩 성공 표시
                 };
 
-                // 로딩 실패하면: 조용히 삭제 (화면에 안 나옴)
                 img.onerror = function() {
                     if (this.src.includes('.png')) {
                         this.src = this.src.replace('.png', '.PNG');
@@ -118,6 +161,14 @@
                     } else {
                         item.remove();
                     }
+                };
+
+                // 클릭 시 모달 열기 (순서 계산 포함)
+                item.onclick = function() {
+                    const visibleImages = document.querySelectorAll('.photo-item.loaded img');
+                    // 현재 클릭한 이미지가 전체 로딩된 이미지 중 몇 번째인지 찾음
+                    currentModalIndex = Array.from(visibleImages).indexOf(img);
+                    openModal();
                 };
 
                 item.appendChild(img);
@@ -132,6 +183,52 @@
             backBtn.style.display = 'none';
             pageTitle.textContent = "My Memory Albums";
             window.scrollTo(0, 0);
+        }
+
+        // --- 모달 & 슬라이드 기능 ---
+        function openModal() {
+            const visibleImages = document.querySelectorAll('.photo-item.loaded img');
+            if(visibleImages.length > 0) {
+                modal.style.display = 'flex';
+                modalImg.src = visibleImages[currentModalIndex].src;
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            modalImg.src = "";
+            document.body.style.overflow = 'auto';
+        }
+
+        function changeSlide(n) {
+            const visibleImages = document.querySelectorAll('.photo-item.loaded img');
+            if (visibleImages.length === 0) return;
+
+            currentModalIndex += n;
+
+            // 순환 로직 (끝에서 누르면 처음으로)
+            if (currentModalIndex >= visibleImages.length) {
+                currentModalIndex = 0;
+            } else if (currentModalIndex < 0) {
+                currentModalIndex = visibleImages.length - 1;
+            }
+
+            modalImg.src = visibleImages[currentModalIndex].src;
+        }
+
+        // 키보드 제어 (좌우 화살표, ESC)
+        document.addEventListener('keydown', function(event) {
+            if (modal.style.display === 'flex') {
+                if (event.key === 'ArrowLeft') changeSlide(-1);
+                if (event.key === 'ArrowRight') changeSlide(1);
+                if (event.key === 'Escape') closeModal();
+            }
+        });
+
+        // 배경 클릭 닫기
+        modal.onclick = function(event) {
+            if (event.target == modal) closeModal();
         }
 
         renderAlbums();
