@@ -6,85 +6,61 @@
     <title>Our Memory</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Lora:ital,wght@1,500&display=swap" rel="stylesheet">
     <style>
-        /* --- 배경 스타일 --- */
+        /* --- 배경 및 레이아웃 --- */
         body {
             margin: 0; padding: 0;
-            
-            /* 1. 파스텔톤 그라데이션 (보라 ~ 분홍) */
+            /* 파스텔톤 배경 */
             background: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%);
-                       
             font-family: 'Gowun Dodum', sans-serif;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            color: #444;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; color: #444;
         }
 
         /* --- 카드 디자인 --- */
         .card {
-            background: rgba(255, 255, 255, 0.65); /* 투명도 조절 (0.65) */
-            width: 85%;
-            max-width: 380px;
-            padding: 50px 30px;
-            border-radius: 30px;
-            text-align: center;
-            
-            /* 그림자와 테두리로 입체감 주기 */
+            background: rgba(255, 255, 255, 0.65);
+            width: 85%; max-width: 380px; padding: 40px 30px;
+            border-radius: 30px; text-align: center;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            backdrop-filter: blur(8.5px); /* 배경 흐리게 */
-            -webkit-backdrop-filter: blur(8.5px);
+            backdrop-filter: blur(8.5px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            
             animation: floatUp 1s ease-out;
+            max-height: 90vh; /* 화면이 작을 때 스크롤 생기게 */
+            overflow-y: auto;
         }
 
+        /* 이름 및 날짜 */
         .names { font-family: 'Lora', serif; font-size: 26px; margin-bottom: 10px; color: #333; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
         .heart { color: #ff6b6b; display: inline-block; animation: beat 1.5s infinite; }
         
-        .date-info { margin-bottom: 40px; }
+        .date-info { margin-bottom: 30px; }
         .start-date { font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 600; }
         .d-day { 
             font-size: 18px; font-weight: bold; color: #ff6b6b; 
-            background: rgba(255, 255, 255, 0.8); /* 디데이 배경도 반투명 */
-            padding: 6px 18px; border-radius: 20px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.8); padding: 6px 18px; border-radius: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: inline-block;
         }
         
         /* 버튼 스타일 */
         .menu-btn {
-            display: block; width: 100%; padding: 18px 0; margin-bottom: 15px;
+            display: block; width: 100%; padding: 16px 0; margin-bottom: 12px;
             text-decoration: none; color: #555; 
-            background: rgba(255, 255, 255, 0.9); /* 버튼도 살짝 투명 */
-            border: none;
-            border-radius: 15px; font-size: 16px; font-weight: bold; transition: all 0.2s ease; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9);
+            border: none; border-radius: 15px; font-size: 15px; font-weight: bold; 
+            transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
-        .menu-btn:hover { 
-            transform: translateY(-2px); 
-            background: #fff; 
-            color: #7b4397; /* 마우스 올리면 글씨색 변경 */
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
-        }
+        .menu-btn:hover { transform: translateY(-2px); background: #fff; color: #7b4397; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         
         /* 강조 버튼 (그라데이션) */
-        .btn-highlight { 
-            background: linear-gradient(to right, #b24592, #f15f79); /* 버튼도 파스텔톤 */
-            color: white; 
-        }
-        .btn-highlight:hover { 
-            background: linear-gradient(to right, #a13481, #e04e68);
-            color: white; 
-        }
+        .btn-highlight { background: linear-gradient(to right, #b24592, #f15f79); color: white; }
+        .btn-highlight:hover { background: linear-gradient(to right, #a13481, #e04e68); color: white; }
         
-        /* 히스토리 버튼 (테두리 포인트) */
-        .btn-history {
-            border-left: 5px solid #ff9a9e !important;
-        }
+        /* 히스토리 & 버킷리스트 포인트 컬러 */
+        .btn-history { border-left: 5px solid #ff9a9e !important; }
+        .btn-bucket { border-left: 5px solid #84fab0 !important; }
 
-        .footer { margin-top: 30px; font-size: 12px; color: #777; }
+        .footer { margin-top: 20px; font-size: 12px; color: #777; }
         
         @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes beat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
@@ -93,11 +69,11 @@
 <body>
 
     <div class="card">
-        <div class="names" id="nameDisplay"></div>
+        <div class="names" id="nameDisplay">유진 <span class="heart">❤</span> 승찬</div>
 
         <div class="date-info">
-            <div class="start-date" id="dateDisplay"></div>
-            <div class="d-day" id="dDayDisplay"></div>
+            <div class="start-date" id="dateDisplay">25.12.06 ~ ing</div>
+            <div class="d-day" id="dDayDisplay">Calculating...</div>
         </div>
 
         <a href="gallery1.html" class="menu-btn">
@@ -111,46 +87,42 @@
         <a href="timeline.html" class="menu-btn btn-history">
             📅 우리의 히스토리
         </a>
-        
-        <a href="bucket.html" class="menu-btn" style="border-left: 5px solid #84fab0;">
+
+        <a href="bucket.html" class="menu-btn btn-bucket">
             ✨ 함께할 버킷리스트
         </a>
+
         <div class="footer">Always be with you</div>
     </div>
 
-  <script src="data.js"></script>
+    <script src="data.js"></script>
 
     <script>
-        // data.js가 로드되었는지 확인하고 데이터 채워넣기
+        
+        // 1. data.js가 잘 연결되었는지 확인
         if (typeof CONFIG !== 'undefined') {
-            // 이름 채우기
+            // 이름과 날짜 텍스트 설정
             document.getElementById('nameDisplay').innerHTML = CONFIG.names;
-
-            // 날짜 표시 (2025-12-06 -> 25.12.06 형태로 변환해서 표시)
             const dateStr = CONFIG.startDate.substring(2).replace(/-/g, '.');
             document.getElementById('dateDisplay').innerText = dateStr + " ~ ing";
 
-            // 디데이 계산 함수
+            // D-Day 계산
             const startDate = new Date(CONFIG.startDate);
             const today = new Date();
             const diff = today - startDate;
-            
-            // Math.floor로 소수점 버림 (1일차부터 시작하려면 +1)
             const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+            
             document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
         } else {
-            // 혹시 data.js 연결 안 됐을 때 비상용 텍스트
-            document.getElementById('nameDisplay').innerHTML = "유진 <span class='heart'>❤</span> 승찬";
-            document.getElementById('dateDisplay').innerText = "25.12.06 ~ ing";
+            // data.js 연결 실패 시 비상용 코드 (수동 계산)
+            // 혹시 data.js에 오타가 있으면 이 부분이 실행됩니다.
+            const startDate = new Date("2025-12-06"); 
+            const today = new Date();
+            const diff = today - startDate;
+            const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
         }
     </script>
 
 </body>
 </html>
-
-</body>
-</html>
-
-
-
-
