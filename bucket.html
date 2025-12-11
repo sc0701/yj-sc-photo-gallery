@@ -6,15 +6,15 @@
     <title>Bucket List</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
+        /* --- 기본 스타일 --- */
         body {
             margin: 0; padding: 20px;
             background-color: #f0f2f5;
-            font-family: 'Gowun Dodum', sans-serif;
-            color: #333;
+            font-family: 'Gowun Dodum', sans-serif; color: #333;
         }
         .container { max-width: 600px; margin: 0 auto; padding-bottom: 50px; }
 
-        /* 상단 네비게이션 */
+        /* --- 헤더 --- */
         .header { text-align: center; margin-bottom: 30px; position: relative; padding-top: 10px; }
         .home-btn { 
             position: absolute; left: 0; top: 0; text-decoration: none; font-size: 24px; 
@@ -23,76 +23,89 @@
         h1 { margin: 0; font-size: 24px; color: #333; }
         p { color: #777; font-size: 14px; margin-top: 5px; }
 
-        /* 진행바 스타일 */
+        /* --- 진행바 컨테이너 --- */
         .progress-container {
             background-color: #e0e0e0;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            height: 25px;
+            border-radius: 25px; /* 더 둥글게 */
+            margin-bottom: 40px;
+            height: 30px; /* 높이 살짝 키움 */
             position: relative;
             overflow: hidden;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
+
+        /* --- 진행바 내부 (핵심 수정!) --- */
         .progress-bar {
-            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            /* 예쁜 그라데이션 */
+            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 50%, #fbc2eb 100%);
             height: 100%;
             width: 0%; /* JS로 조절 */
-            border-radius: 20px;
+            border-radius: 25px;
             transition: width 1s ease-in-out;
+            
             display: flex;
             align-items: center;
-            justify-content: center;
+            padding-left: 15px;
+            
             color: white;
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 13px; font-weight: bold;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            box-sizing: border-box;
         }
 
-        /* 버킷리스트 아이템 스타일 */
+        /* --- 리스트 아이템 기본 스타일 --- */
         .bucket-list { list-style: none; padding: 0; }
-        
         .bucket-item {
             background: white;
-            margin-bottom: 15px;
-            padding: 15px 20px;
+            margin-bottom: 15px; padding: 15px 20px;
             border-radius: 15px;
-            display: flex;
-            align-items: center;
+            display: flex; align-items: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            transition: transform 0.2s, background 0.2s;
-            border: 1px solid transparent;
+            transition: all 0.3s ease; /* 부드러운 전환 효과 */
+            border: 2px solid transparent; /* 테두리 공간 미리 확보 */
         }
+        .bucket-item:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
 
-        .bucket-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-        }
-
-        /* 체크박스 디자인 */
+        /* 기본 체크 아이콘 (빈 동그라미) */
         .check-icon {
-            width: 24px; height: 24px;
-            border: 2px solid #ddd;
-            border-radius: 50%;
+            width: 26px; height: 26px;
+            border: 2px solid #ddd; border-radius: 50%;
             margin-right: 15px;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 16px;
-            transition: all 0.3s;
+            color: transparent; /* 기본 상태엔 체크 안 보이게 */
+            font-size: 16px; flex-shrink: 0; transition: all 0.3s;
         }
+        .bucket-text { font-size: 17px; flex-grow: 1; color: #555; transition: color 0.3s; }
 
-        .bucket-text { font-size: 16px; flex-grow: 1; transition: color 0.3s; }
-
-        /* 완료된 항목 스타일 (done: true) */
+        /* --- [수정됨] 완료된 항목 스타일 (축하하는 느낌!) --- */
         .bucket-item.done {
-            background-color: #fff0f0; /* 배경색 살짝 변경 */
-            border-color: #ffdde1;
+            /* 배경: 부정적인 빨간색 -> 예쁜 그라데이션 테두리와 연한 배경 */
+            background: linear-gradient(to right, #fdfbfb, #ebedee); 
+            border-color: #a18cd1; /* 보라색 테두리 강조 */
+            box-shadow: 0 5px 15px rgba(161, 140, 209, 0.3); /* 빛나는 듯한 그림자 */
         }
+
         .bucket-item.done .check-icon {
-            background-color: #ff6b6b;
-            border-color: #ff6b6b;
+            /* 체크박스: 그라데이션 채우기 */
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            border: none;
+            color: white; /* 체크 표시 흰색으로 */
+            font-size: 18px;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* 뿅! 나타나는 효과 */
         }
+
         .bucket-item.done .bucket-text {
-            color: #aaa;
-            text-decoration: line-through;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* 체크 아이콘 뿅! 애니메이션 */
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -106,7 +119,7 @@
         </div>
 
         <div class="progress-container">
-            <div class="progress-bar" id="progressBar">0%</div>
+            <div class="progress-bar" id="progressBar">0% 달성!</div>
         </div>
 
         <ul class="bucket-list" id="bucketUl"></ul>
@@ -116,16 +129,21 @@
     <script>
         const bucketUl = document.getElementById('bucketUl');
         const progressBar = document.getElementById('progressBar');
-        const listData = CONFIG.bucketList;
+        
+        let listData = [];
+        // data.js에서 데이터 가져오기
+        if (typeof CONFIG !== 'undefined' && CONFIG.bucketList) {
+            listData = CONFIG.bucketList;
+        }
 
-        // 1. 리스트 그리기
+        // 리스트 그리기
         let completedCount = 0;
 
         listData.forEach(item => {
             const li = document.createElement('li');
             li.className = 'bucket-item';
             
-            // 완료 여부 체크
+            // 완료된 항목 처리
             if (item.done) {
                 li.classList.add('done');
                 completedCount++;
@@ -135,25 +153,21 @@
                 <div class="check-icon">✔</div>
                 <div class="bucket-text">${item.text}</div>
             `;
-            
-            // 
-            li.onclick = function() {
-                alert;
-            };
 
-            bucketUl.appendChild(li);
-        });
-
-        // 2. 진행률 계산 및 업데이트
-        const total = listData.length;
-        const percent = Math.round((completedCount / total) * 100);
-        
-        // 애니메이션 효과를 위해 약간의 지연 후 실행
-        setTimeout(() => {
-            progressBar.style.width = percent + "%";
-            progressBar.innerText = percent + "% 달성!";
-        }, 100);
-
+        // 진행률 업데이트
+        if (listData.length > 0) {
+            const percent = Math.round((completedCount / listData.length) * 100);
+            // 애니메이션을 위해 약간의 딜레이
+            setTimeout(() => {
+                progressBar.style.width = percent + "%";
+                // 퍼센트가 너무 낮을 때는 글씨가 잘리니, 10% 이상일 때만 글씨 표시
+                if (percent > 10) {
+                    progressBar.innerText = percent + "% 달성! 🎉";
+                } else {
+                    progressBar.innerText = ""; //
+                }
+            }, 100);
+        }
     </script>
 </body>
 </html>
