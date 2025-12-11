@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gallery</title>
+    <style>
+        /* 기본 설정 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            font-family: sans-serif;
+            color: #333;
+        }
+
+        /* 갤러리 컨테이너 */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            min-height: 100vh;
+        }
+
+        /* 헤더 */
+        header {
+            text-align: center;
+            padding: 40px 0 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: bold;
+            color: #222;
+            margin: 0;
+        }
+
+        /* 사진 감싸는 박스 */
+        .photo-wrapper {
+            margin-bottom: 50px;
+            text-align: center;
+            display: block; 
+        }
+
+        /* 이미지 스타일 */
+        .photo-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* 번호표 스타일 */
+        .photo-number {
+            display: inline-block;
+            margin-bottom: 12px;
+            color: #888;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>My Photo Archive</h1>
+        </header>
+
+        <div id="gallery"></div>
+    </div>
+
+    <script>
+        const gallery = document.getElementById('gallery');
+        const maxCheck = 1000; // 최대 1000번까지 체크
+        const folderPath = 'images/';
+        
+        // 1. 기본 확장자를 대문자 .PNG로 설정했습니다.
+        const defaultExtension = '.PNG'; 
+
+        for (let i = 1; i <= maxCheck; i++) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'photo-wrapper';
+            
+            const numberLabel = document.createElement('div');
+            numberLabel.className = 'photo-number';
+            numberLabel.textContent = `No. ${i}`;
+            
+            const img = document.createElement('img');
+            
+            // 일단 대문자 PNG로 시도합니다 (예: images/1.PNG)
+            img.src = folderPath + i + defaultExtension;
+            img.alt = `Photo ${i}`;
+            img.loading = 'lazy';
+
+            // *** 똑똑한 에러 처리 (핵심!) ***
+            img.onerror = function() {
+                // 만약 대문자(.PNG) 로딩에 실패했다면?
+                if (this.src.includes('.PNG')) {
+                    // "혹시 소문자(.png) 인가?" 하고 다시 한번 시도해봅니다.
+                    this.src = this.src.replace('.PNG', '.png');
+                } else {
+                    // 소문자(.png)까지 해봤는데도 없으면 -> 진짜 없는 파일이므로 숨깁니다.
+                    wrapper.remove();
+                }
+            };
+
+            wrapper.appendChild(numberLabel);
+            wrapper.appendChild(img);
+            gallery.appendChild(wrapper);
+        }
+    </script>
+</body>
+</html>
