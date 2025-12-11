@@ -3,178 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YUJIN & SEUNGCHAN</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Our Memory</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Lora:ital,wght@1,500&display=swap" rel="stylesheet">
-
     <style>
-        /* --- 전체 배경 및 레이아웃 --- */
+        /* (스타일은 아까와 동일하지만, 타임라인 버튼 스타일이 추가됨) */
         body {
-            margin: 0;
-            padding: 0;
-            /* 배경: 은은하고 따뜻한 그라데이션 */
+            margin: 0; padding: 0;
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            font-family: 'Gowun Dodum', sans-serif; /* 기본 한글 폰트 */
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            color: #444;
+            font-family: 'Gowun Dodum', sans-serif;
+            height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; color: #444;
         }
-
-        /* 중앙 카드 박스 */
         .card {
-            background: rgba(255, 255, 255, 0.85);
-            width: 85%;
-            max-width: 380px;
-            padding: 50px 30px;
-            border-radius: 30px;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); /* 부드러운 그림자 */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.6);
-            animation: floatUp 1s ease-out;
+            background: rgba(255, 255, 255, 0.85); width: 85%; max-width: 380px; padding: 50px 30px;
+            border-radius: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.6); animation: floatUp 1s ease-out;
         }
-
-        /* 이름 스타일 (영문 필기체 느낌) */
-        .names {
-            font-family: 'Lora', serif;
-            font-size: 26px;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-            color: #333;
-        }
+        .names { font-family: 'Lora', serif; font-size: 26px; margin-bottom: 10px; color: #333; }
+        .heart { color: #ff6b6b; display: inline-block; animation: beat 1.5s infinite; }
+        .date-info { margin-bottom: 40px; }
+        .start-date { font-size: 14px; color: #888; margin-bottom: 5px; }
+        .d-day { font-size: 18px; font-weight: bold; color: #ff6b6b; background: #fff0f0; padding: 5px 15px; border-radius: 20px; }
         
-        .heart {
-            color: #ff6b6b;
-            display: inline-block;
-            animation: beat 1.5s infinite; /* 하트 두근거림 애니메이션 */
-        }
-
-        /* 날짜 및 디데이 스타일 */
-        .date-info {
-            margin-bottom: 40px;
-        }
-
-        .start-date {
-            font-size: 14px;
-            color: #888;
-            margin-bottom: 5px;
-        }
-
-        .d-day {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff6b6b; /* 포인트 컬러 */
-            background: #fff0f0;
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-
-        /* 메뉴 버튼 스타일 */
         .menu-btn {
-            display: block;
-            width: 100%;
-            padding: 18px 0;
-            margin-bottom: 15px;
-            text-decoration: none;
-            color: #555;
-            background: white;
-            border: 1px solid #eee;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-            box-sizing: border-box;
+            display: block; width: 100%; padding: 18px 0; margin-bottom: 15px;
+            text-decoration: none; color: #555; background: white; border: 1px solid #eee;
+            border-radius: 15px; font-size: 16px; font-weight: bold; transition: all 0.2s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
         }
-
-        .menu-btn:hover {
-            transform: translateY(-2px);
-            background: #fafafa;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border-color: #ddd;
-            color: #333;
-        }
-
-        /* 강조하고 싶은 버튼 (앨범) */
-        .btn-highlight {
-            background-color: #333;
-            color: white;
-            border: none;
-        }
-        .btn-highlight:hover {
-            background-color: #555;
-            color: white;
-        }
-
-        /* 하단 장식 텍스트 */
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        /* --- 애니메이션 정의 --- */
-        @keyframes floatUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes beat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
+        .menu-btn:hover { transform: translateY(-2px); background: #fafafa; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: #ddd; color: #333; }
+        .btn-highlight { background-color: #333; color: white; border: none; }
+        .btn-highlight:hover { background-color: #555; color: white; }
+        
+        .footer { margin-top: 30px; font-size: 12px; color: #aaa; }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes beat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div class="names">
-            YUJIN <span class="heart">❤</span> SEUNGCHAN
-        </div>
+        <div class="names" id="nameDisplay"></div>
 
         <div class="date-info">
-            <div class="start-date">25.12.06 ~ ing</div>
-            <div class="d-day" id="dDayCount">♥ D+1</div>
+            <div class="start-date" id="dateDisplay"></div>
+            <div class="d-day" id="dDayDisplay"></div>
         </div>
 
-        <a href="gallery1.html" class="menu-btn">
-            📂 첫 번째 기록장
-        </a>
+        <a href="gallery1.html" class="menu-btn">📂 전체 사진 보기</a>
+        <a href="gallery2.html" class="menu-btn btn-highlight">🖼️ 앨범별로 보기</a>
         
-        <a href="gallery2.html" class="menu-btn btn-highlight">
-            🖼️ 우리의 앨범 보기
-        </a>
+        <a href="timeline.html" class="menu-btn" style="border-left: 5px solid #ff9a9e;">📅 우리의 히스토리</a>
 
-        <div class="footer">
-            Always be with you
-        </div>
+        <div class="footer">Always be with you</div>
     </div>
 
+    <script src="data.js"></script>
+
     <script>
-        // --- ★ 디데이 자동 계산 스크립트 ★ ---
+        // data.js에 있는 정보를 가져와서 화면에 뿌립니다.
+        
+        // 1. 이름 설정
+        document.getElementById('nameDisplay').innerHTML = CONFIG.names;
+
+        // 2. 날짜 설정
+        document.getElementById('dateDisplay').innerText = CONFIG.startDate.replace(/-/g, '.') + " ~ ing";
+
+        // 3. 디데이 계산
         function calcDDay() {
-            const startDate = new Date("2025-12-06"); // 시작일
-            const today = new Date(); // 오늘
-
-            // 시간 차이 계산 (밀리초 단위)
+            const startDate = new Date(CONFIG.startDate);
+            const today = new Date();
             const diff = today - startDate;
-            
-            // 일(Day) 단위로 변환 (나누기 1000ms * 60초 * 60분 * 24시간)
-            // Math.floor는 소수점 버림
-            const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1; // 1일차부터 시작하려면 +1
-
-            // 화면에 표시
-            document.getElementById("dDayCount").innerText = "♥ D+" + dayCount;
+            const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
         }
-
-        calcDDay(); // 실행
+        calcDDay();
     </script>
 
 </body>
