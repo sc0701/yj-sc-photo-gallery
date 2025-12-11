@@ -6,16 +6,13 @@
     <title>Our Memory</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Lora:ital,wght@1,500&display=swap" rel="stylesheet">
     <style>
-        /* --- [수정됨] 배경 스타일 --- */
+        /* --- 배경 스타일 --- */
         body {
             margin: 0; padding: 0;
             
             /* 1. 파스텔톤 그라데이션 (보라 ~ 분홍) */
-            background: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-            /* 만약 다른 색을 원하시면 아래 코드 중 하나로 바꿔보세요! */
-            /* 1) 솜사탕(분홍~하늘): background: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%); */
-            /* 2) 복숭아(주황~분홍): background: linear-gradient(120deg, #f6d365 0%, #fda085 100%); */
-            
+            background: linear-gradient(120deg, #fccb90 0%, #d57eeb 100%);
+                       
             font-family: 'Gowun Dodum', sans-serif;
             height: 100vh;
             display: flex;
@@ -25,7 +22,7 @@
             color: #444;
         }
 
-        /* --- [수정됨] 카드 디자인 (유리 효과 강화) --- */
+        /* --- 카드 디자인 --- */
         .card {
             background: rgba(255, 255, 255, 0.65); /* 투명도 조절 (0.65) */
             width: 85%;
@@ -133,10 +130,11 @@
             const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
             document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
         } else {
-            document.getElementById('nameDisplay').innerHTML = "YUJIN <span class='heart'>❤</span> SEUNGCHAN";
+            document.getElementById('nameDisplay').innerHTML = "유진 <span class='heart'>❤</span> 승찬";
             document.getElementById('dateDisplay').innerText = "25.12.06 ~ ing";
         }
     </script>
 
 </body>
 </html>
+
