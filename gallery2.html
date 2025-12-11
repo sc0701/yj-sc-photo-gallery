@@ -6,147 +6,47 @@
     <title>My Albums</title>
     <style>
         /* --- 기본 스타일 --- */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            font-family: 'Apple SD Gothic Neo', sans-serif;
-            color: #333;
-        }
-
-        /* --- 상단 네비게이션 바 --- */
+        body { margin: 0; padding: 0; background-color: #f0f2f5; font-family: sans-serif; color: #333; }
+        
+        /* 네비게이션 */
         .nav-bar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            padding: 15px 20px; display: flex; align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;
         }
+        .home-btn { text-decoration: none; font-size: 24px; margin-right: 15px; }
+        .page-title { font-size: 18px; font-weight: bold; flex-grow: 1; text-align: center; }
+        .back-btn { display: none; padding: 8px 16px; background: #333; color: white; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; }
+        
+        /* 컨테이너 */
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; }
 
-        .home-btn {
-            text-decoration: none;
-            font-size: 24px;
-            margin-right: 15px;
-            transition: transform 0.2s;
-        }
-        .home-btn:hover { transform: scale(1.1); }
-
-        .page-title {
-            font-size: 18px;
-            font-weight: bold;
-            flex-grow: 1; /* 중간 공간 차지 */
-            text-align: center;
-        }
-
-        .back-btn {
-            display: none; /* 처음엔 숨김 (앨범 안에 들어갔을 때만 보임) */
-            padding: 8px 16px;
-            background: #333;
-            color: white;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            transition: background 0.2s;
-        }
-        .back-btn:hover { background: #555; }
-
-        /* --- 메인 컨테이너 --- */
-        .container {
-            max-width: 1000px;
-            margin: 30px auto;
-            padding: 20px;
-        }
-
-        /* --- 1. 앨범 목록 화면 (폴더 아이콘들) --- */
-        .album-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
-        }
-
+        /* 앨범 목록 */
+        .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         .album-card {
-            background: white;
-            border-radius: 16px;
-            padding: 25px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+            background: white; border-radius: 16px; padding: 30px 20px; text-align: center; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; transition: transform 0.2s;
         }
-        .album-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            border-color: #ddd;
-        }
+        .album-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .folder-icon { font-size: 50px; display: block; margin-bottom: 15px; }
+        .album-name { font-weight: bold; font-size: 18px; color: #222; }
 
-        .folder-icon {
-            font-size: 45px;
-            margin-bottom: 15px;
-            display: block;
-        }
-        
-        .album-name {
-            font-weight: bold;
-            font-size: 17px;
-            color: #222;
-            margin-bottom: 5px;
-        }
-        
-        .album-count {
-            font-size: 13px;
-            color: #888;
-        }
+        /* 사진 목록 */
+        .photo-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .photo-item { aspect-ratio: 1 / 1; background: #eee; border-radius: 4px; overflow: hidden; position: relative; display: none; } /* 처음엔 숨김 */
+        .photo-item.loaded { display: block; animation: fadeIn 0.5s forwards; } /* 로딩되면 보임 */
+        .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .photo-item:hover img { transform: scale(1.05); }
 
-        /* --- 2. 사진 리스트 화면 (그리드) --- */
-        .photo-grid {
-            display: none; /* 처음엔 숨김 */
-            grid-template-columns: repeat(3, 1fr); /* 3열 배열 */
-            gap: 5px;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .photo-item {
-            aspect-ratio: 1 / 1; /* 정사각형 비율 */
-            overflow: hidden;
-            background: #eee;
-            border-radius: 4px;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* 꽉 차게 */
-            transition: transform 0.3s;
-            opacity: 0; /* 로딩 전 투명 */
-        }
-        
-        /* 로딩 완료시 페이드인 효과 */
-        .photo-item img.loaded {
-            opacity: 1;
-        }
-
-        .photo-item:hover img {
-            transform: scale(1.05);
-        }
-
-        /* 모바일 대응 */
         @media (max-width: 600px) {
-            .album-grid { grid-template-columns: repeat(2, 1fr); } /* 앨범 2열 */
-            .photo-grid { grid-template-columns: repeat(3, 1fr); } /* 사진 3열 */
+            .album-grid { grid-template-columns: repeat(2, 1fr); }
+            .photo-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
 <body>
-
     <div class="nav-bar">
         <a href="index.html" class="home-btn">🏠</a>
         <div class="page-title" id="pageTitle">My Memory Albums</div>
@@ -155,99 +55,77 @@
 
     <div class="container">
         <div class="album-grid" id="albumList"></div>
-
         <div class="photo-grid" id="photoList"></div>
     </div>
 
     <script>
-        // ====================================================
-        // ★ [설정 구역] 여기에 앨범을 계속 추가하면 됩니다!
-        // ====================================================
+        // ★ 설정: 개수(count)를 입력할 필요가 없습니다. 폴더 이름만 적으세요.
         const albums = [
-            { 
-                name: "2025.12", 
-                folder: "2025.12", 
-                count: 80 
-            },
-            // 콤마(,) 찍고 아래에 계속 추가 가능
-            // { name: "2026.01", folder: "2026.01", count: 30 }
+            { name: "2025.12", folder: "2025.12" },
+            // { name: "2026.01", folder: "2026.01" },
         ];
 
-        // 기본 경로 설정 (images2 폴더 안을 바라봄)
-        const basePath = "images2/";  
-        const ext = ".png"; // 기본 확장자 (소문자)
+        // ★ 설정: 앨범당 최대 몇 장까지 체크할까요? (넉넉하게 500장 설정)
+        const maxCheck = 500; 
+        const basePath = "images2/";
+        const ext = ".png"; 
 
-        // HTML 요소 가져오기
         const albumList = document.getElementById('albumList');
         const photoList = document.getElementById('photoList');
         const pageTitle = document.getElementById('pageTitle');
         const backBtn = document.getElementById('backBtn');
 
-        // 1. 시작: 앨범 목록 화면 만들기
         function renderAlbums() {
             albumList.innerHTML = "";
-            
             albums.forEach((album, index) => {
                 const card = document.createElement('div');
                 card.className = 'album-card';
-                card.onclick = () => openAlbum(index); // 클릭하면 앨범 열기
-
-                card.innerHTML = `
-                    <span class="folder-icon">📁</span>
-                    <div class="album-name">${album.name}</div>
-                    <div class="album-count">${album.count} Photos</div>
-                `;
+                card.onclick = () => openAlbum(index);
+                // 개수 표시를 아예 뺐습니다. 깔끔하죠?
+                card.innerHTML = `<span class="folder-icon">📁</span><div class="album-name">${album.name}</div>`;
                 albumList.appendChild(card);
             });
         }
 
-        // 2. 앨범 열기 (사진들 보여주기)
         function openAlbum(index) {
             const album = albums[index];
-            
-            // 화면 전환
             albumList.style.display = 'none';
             photoList.style.display = 'grid';
-            backBtn.style.display = 'block'; // 뒤로가기 버튼 등장
-            pageTitle.textContent = album.name; // 제목을 앨범 이름으로
+            backBtn.style.display = 'block';
+            pageTitle.textContent = album.name;
+            photoList.innerHTML = "";
 
-            photoList.innerHTML = ""; // 기존 사진 비우기
-
-            // 사진 채우기
-            for (let i = 1; i <= album.count; i++) {
+            // 무조건 1번부터 500번까지 시도합니다.
+            for (let i = 1; i <= maxCheck; i++) {
                 const item = document.createElement('div');
                 item.className = 'photo-item';
                 
                 const img = document.createElement('img');
-                
-                // 경로 생성: images2 / 폴더명 / 번호.png
                 img.src = `${basePath}${album.folder}/${i}${ext}`;
                 img.loading = 'lazy';
                 
-                // 로딩 성공 시 부드럽게 나타나기
+                // 로딩 성공하면: 박스를 보여줌 (loaded 클래스 추가)
                 img.onload = function() {
-                    this.classList.add('loaded');
+                    item.classList.add('loaded');
                 };
 
-                // 에러 처리 (대소문자 체크 & 없으면 삭제)
+                // 로딩 실패하면: 조용히 삭제 (화면에 안 나옴)
                 img.onerror = function() {
                     if (this.src.includes('.png')) {
                         this.src = this.src.replace('.png', '.PNG');
                     } else if (this.src.includes('.PNG')) {
-                        // 대문자도 없으면 -> jpg 한번 더 체크 (혹시 몰라서)
                          this.src = this.src.replace('.PNG', '.jpg');
                     } else {
-                        item.remove(); // 진짜 없으면 박스 삭제
+                        item.remove();
                     }
                 };
 
                 item.appendChild(img);
                 photoList.appendChild(item);
             }
-            window.scrollTo(0, 0); // 맨 위로
+            window.scrollTo(0, 0);
         }
 
-        // 3. 목록으로 돌아오기
         function showAlbumList() {
             albumList.style.display = 'grid';
             photoList.style.display = 'none';
@@ -256,9 +134,7 @@
             window.scrollTo(0, 0);
         }
 
-        // 실행
         renderAlbums();
-
     </script>
 </body>
 </html>
