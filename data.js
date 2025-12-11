@@ -1,6 +1,6 @@
 const CONFIG = {
     // 1. 기본 정보
-    names: "YUJIN <span class='heart'>❤</span> SEUNGCHAN", // 이름
+    names: "유진 <span class='heart'>❤</span> 승찬", // 이름
     startDate: "2025-12-06", // 사귄 날짜 (YYYY-MM-DD)
     
     // 2. 앨범 목록
@@ -13,4 +13,5 @@ const CONFIG = {
     timeline: [
         { date: "2025.12.06", title: "우리의 시작", desc: "우리가 처음 연인이 된 날 ✨" },   
     ]
+
 };
