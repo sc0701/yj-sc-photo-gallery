@@ -95,34 +95,38 @@
         <div class="footer">Always be with you</div>
     </div>
 
-    <script src="data.js"></script>
+<script src="data.js"></script>
 
     <script>
-        
         // 1. data.js가 잘 연결되었는지 확인
         if (typeof CONFIG !== 'undefined') {
             // 이름과 날짜 텍스트 설정
             document.getElementById('nameDisplay').innerHTML = CONFIG.names;
+            
+            // 날짜 표시 (2025-12-06 -> 25.12.06)
             const dateStr = CONFIG.startDate.substring(2).replace(/-/g, '.');
             document.getElementById('dateDisplay').innerText = dateStr + " ~ ing";
 
-            // D-Day 계산
+            // ★ [수정됨] 정밀 D-Day 계산 (시간 오차 제거)
             const startDate = new Date(CONFIG.startDate);
             const today = new Date();
+
+            // 시간/분/초를 모두 0으로 만들어서 딱 '날짜' 차이만 계산하게 함
+            startDate.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+
             const diff = today - startDate;
+            // 하루는 86400000 밀리초
             const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
             
             document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
+
         } else {
-            // data.js 연결 실패 시 비상용 코드 (수동 계산)
-            // 혹시 data.js에 오타가 있으면 이 부분이 실행됩니다.
-            const startDate = new Date("2025-12-06"); 
-            const today = new Date();
-            const diff = today - startDate;
-            const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
-            document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
+            // data.js 연결 실패 시 (비상용)
+            document.getElementById('nameDisplay').innerHTML = "유진 <span class='heart'>❤</span> 승찬";
+            document.getElementById("dDayDisplay").innerText = "D-Day 계산 중...";
         }
     </script>
-
 </body>
 </html>
+
