@@ -23,13 +23,14 @@
         .date-info { margin-bottom: 30px; }
         .start-date { font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 600; }
         .d-day { font-size: 18px; font-weight: bold; color: #ff6b6b; background: rgba(255, 255, 255, 0.8); padding: 6px 18px; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: inline-block; }
+        
         .menu-btn { display: block; width: 100%; padding: 16px 0; margin-bottom: 12px; text-decoration: none; color: #555; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 15px; font-size: 15px; font-weight: bold; transition: all 0.2s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .menu-btn:hover { transform: translateY(-2px); background: #fff; color: #7b4397; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .btn-highlight { background: linear-gradient(to right, #b24592, #f15f79); color: white; }
+        .btn-highlight:hover { background: linear-gradient(to right, #a13481, #e04e68); color: white; }
         .btn-history { border-left: 5px solid #ff9a9e !important; }
         .btn-bucket { border-left: 5px solid #84fab0 !important; }
-        .btn-guest { border-left: 5px solid #a1c4fd !important; }
-        .btn-photo { border-left: 5px solid #764ba2 !important; }
+        
         .footer { margin-top: 20px; font-size: 12px; color: #777; }
         @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes beat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
@@ -37,67 +38,38 @@
 </head>
 <body>
     <div class="card">
-        <div class="names" id="nameDisplay">Loading...</div>
+        <div class="names" id="nameDisplay"></div>
         <div class="date-info">
             <div class="start-date" id="dateDisplay"></div>
-            <div class="d-day" id="dDayDisplay">Calculating...</div>
+            <div class="d-day" id="dDayDisplay"></div>
         </div>
 
-        <a href="gallery_realtime.html" class="menu-btn btn-photo">📸 실시간 포토 갤러리</a>
         <a href="gallery1.html" class="menu-btn">📂 첫 번째 기록장</a>
-        <a href="gallery2.html" class="menu-btn btn-highlight">🖼️ 정적 앨범 보기</a>
+        <a href="gallery2.html" class="menu-btn btn-highlight">🖼️ 우리의 앨범 보기</a>
         <a href="timeline.html" class="menu-btn btn-history">📅 우리의 히스토리</a>
         <a href="bucket.html" class="menu-btn btn-bucket">✨ 함께할 버킷리스트</a>
-        <a href="guestbook.html" class="menu-btn btn-guest">💌 방명록 남기기</a>
 
         <div class="footer">Always be with you</div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        const myData = {
+            names: "승찬 <span class='heart'>❤</span> 유진", 
+            startDate: "2025-12-06" 
+        };
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        // ------------------------------------------------
+        // ------------------------------------------------
+        document.getElementById('nameDisplay').innerHTML = myData.names;
+        document.getElementById('dateDisplay').innerText = myData.startDate.replace(/-/g, '.') + " ~ ing";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyANq4I8DZbehfYXy8vhfvEGOuES2sIIM88",
-  authDomain: "yj-sc-memory.firebaseapp.com",
-  projectId: "yj-sc-memory",
-  storageBucket: "yj-sc-memory.firebasestorage.app",
-  messagingSenderId: "827467276790",
-  appId: "1:827467276790:web:d747825d06c334614fe7d7",
-  measurementId: "G-YYCFN18XRL"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        onSnapshot(doc(db, "config", "main"), (doc) => {
-            if (doc.exists()) {
-                const data = doc.data();
-                document.getElementById('nameDisplay').innerHTML = data.names;
-                
-                const dateStr = data.startDate.substring(2).replace(/-/g, '.');
-                document.getElementById('dateDisplay').innerText = dateStr + " ~ ing";
-                
-                const startDate = new Date(data.startDate);
-                const today = new Date();
-                startDate.setHours(0,0,0,0); today.setHours(0,0,0,0);
-                const diff = today - startDate;
-                const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
-                document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
-            }
-        });
+        const start = new Date(myData.startDate);
+        const now = new Date();
+        start.setHours(0,0,0,0);
+        now.setHours(0,0,0,0);
+        const diff = now - start;
+        const dayCount = Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+        document.getElementById("dDayDisplay").innerText = "♥ D+" + dayCount;
     </script>
 </body>
 </html>
