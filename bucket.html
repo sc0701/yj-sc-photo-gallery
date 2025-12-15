@@ -6,29 +6,94 @@
     <title>Bucket List</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 20px; background-color: #f0f2f5; font-family: 'Gowun Dodum', sans-serif; color: #333; }
+        body { 
+            margin: 0; padding: 20px; 
+            background-color: #f6f8fa; 
+            font-family: 'Gowun Dodum', sans-serif; 
+            color: #333; 
+        }
         .container { max-width: 600px; margin: 0 auto; padding-bottom: 50px; }
-        .header { text-align: center; margin-bottom: 30px; position: relative; padding-top: 10px; }
-        .home-btn { position: absolute; left: 0; top: 0; text-decoration: none; font-size: 24px; background: white; width: 40px; height: 40px; line-height: 40px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h1 { margin: 0; font-size: 24px; color: #333; }
-        .bucket-list { list-style: none; padding: 0; }
-        .bucket-item { background: white; margin-bottom: 15px; padding: 15px 20px; border-radius: 15px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; }
-        .bucket-item:hover { transform: translateY(-2px); }
-        .check-icon { margin-right: 15px; color: #ddd; font-size: 18px; }
-        .bucket-text { font-size: 17px; flex-grow: 1; color: #555; }
         
-        /* 완료된 항목 스타일 */
-        .done { background: #eee; }
-        .done .bucket-text { text-decoration: line-through; color: #aaa; }
-        .done .check-icon { color: #2ecc71; }
+        /* 상단 헤더 */
+        .header { text-align: center; margin-bottom: 40px; position: relative; padding-top: 20px; }
+        .home-btn { 
+            position: absolute; left: 0; top: 10px; text-decoration: none; font-size: 22px; 
+            background: white; width: 45px; height: 45px; line-height: 45px; border-radius: 50%; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
+        }
+        .home-btn:hover { transform: scale(1.1); }
+        
+        h1 { margin: 0; font-size: 26px; color: #2c3e50; letter-spacing: -1px; }
+        p { color: #888; font-size: 14px; margin-top: 8px; }
+
+        /* 리스트 스타일 */
+        .bucket-list { list-style: none; padding: 0; }
+        .bucket-item { 
+            background: white; margin-bottom: 18px; padding: 20px 25px; 
+            border-radius: 20px; display: flex; align-items: center; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 2px solid transparent; /* 테두리 공간 미리 확보 */
+        }
+        
+        .bucket-item:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        
+        /* 체크 아이콘 (기본: 회색 동그라미) */
+        .check-icon { 
+            width: 28px; height: 28px; border-radius: 50%; border: 2px solid #ddd; 
+            margin-right: 18px; display: flex; align-items: center; justify-content: center; 
+            color: white; font-size: 16px; transition: 0.3s; background: white;
+        }
+        
+        .bucket-text { font-size: 18px; flex-grow: 1; color: #555; transition: 0.3s; }
+
+        /* ★★★ [중요] 달성했을 때(Done) 스타일 ★★★ */
+        .bucket-item.done {
+            /* 배경을 은은한 핑크 골드 그라데이션으로 */
+            background: linear-gradient(135deg, #fff6f6 0%, #fff0f0 100%);
+            /* 테두리를 예쁜 색으로 강조 */
+            border-color: #ffc3a0;
+            box-shadow: 0 8px 20px rgba(255, 154, 158, 0.2);
+            transform: scale(1.02); /* 살짝 커짐 */
+        }
+
+        .bucket-item.done .check-icon {
+            background: #ff9a9e; /* 아이콘 색상 변경 */
+            border-color: #ff9a9e;
+            box-shadow: 0 0 10px rgba(255, 154, 158, 0.5);
+            animation: pop 0.4s ease; /* 톡 터지는 효과 */
+        }
+
+        .bucket-item.done .bucket-text {
+            /* 삭선(line-through) 제거! */
+            text-decoration: none; 
+            /* 글씨를 더 진하고 예쁜 색으로 변경 */
+            color: #d66d75; 
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+        }
+
+        /* 완료 시 텍스트 옆에 붙을 뱃지 (가상 요소) */
+        .bucket-item.done .bucket-text::after {
+            content: " ✨"; /* 반짝이 추가 */
+            font-size: 18px;
+        }
+
+        @keyframes pop { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.3); } 
+            100% { transform: scale(1); } 
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <a href="index.html" class="home-btn">🏠</a>
-            <h1>우리의 버킷리스트 ✨</h1>
+            <h1>우리의 버킷리스트 📜</h1>
+            <p>하나씩 이루어가는 기쁨!</p>
         </div>
+        
         <ul class="bucket-list" id="bucketUl"></ul>
     </div>
 
@@ -45,22 +110,34 @@
             { text: "인생네컷 매달 찍어서 남기기", done: false },
             { text: "취향 맞는 영화 보러가기", done: false }
         ];
-
-        // 리스트 그리기
         const ul = document.getElementById('bucketUl');
+        ul.innerHTML = "";
+
         bucketList.forEach(item => {
             const li = document.createElement('li');
             li.className = 'bucket-item' + (item.done ? ' done' : '');
+            
+            // 완료 여부에 따라 아이콘 모양 다르게 (체크 vs 빈칸)
+            const iconMark = item.done ? '✔' : ''; 
+            
             li.innerHTML = `
-                <div class="check-icon">✔</div>
+                <div class="check-icon">${iconMark}</div>
                 <div class="bucket-text">${item.text}</div>
             `;
+            
             li.onclick = () => {
                 li.classList.toggle('done');
+                // 클릭하면 즉시 체크 표시 바뀌게 처리
+                const icon = li.querySelector('.check-icon');
+                if(li.classList.contains('done')) {
+                    icon.innerText = '✔';
+                } else {
+                    icon.innerText = '';
+                }
             };
+            
             ul.appendChild(li);
         });
     </script>
 </body>
 </html>
-
