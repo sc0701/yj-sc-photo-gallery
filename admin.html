@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>페이지 관리자</title>
+    <title>커플 페이지 관리자</title>
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
         body { padding: 40px; font-family: 'Gowun Dodum', sans-serif; background: #f4f4f4; max-width: 600px; margin: 0 auto; color: #333; }
@@ -25,9 +24,9 @@
 
     <div class="box">
         <h2>1. 메인 정보 수정</h2>
-        <label>유진 ❤ 승찬</label>
+        <label>표시할 이름 (예: 철수 ❤ 영희)</label>
         <input type="text" id="namesInput" placeholder="로딩 중...">
-        <label>2025-12-06</label>
+        <label>사귄 날짜 (예: 2023-12-25)</label>
         <input type="text" id="dateInput" placeholder="로딩 중...">
         <button onclick="saveConfig()">정보 업데이트 💾</button>
         <div id="msg1" class="alert">저장되었습니다!</div>
@@ -66,11 +65,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 초기 데이터 로드
+        // 1. 초기 데이터 로드
         async function loadConfig() {
             try {
                 const docSnap = await getDoc(doc(db, "config", "main"));
@@ -78,33 +76,48 @@ const analytics = getAnalytics(app);
                     document.getElementById('namesInput').value = docSnap.data().names;
                     document.getElementById('dateInput').value = docSnap.data().startDate;
                 }
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error("데이터 불러오기 에러:", e); 
+            }
         }
         loadConfig();
 
-        // 1. 설정 저장
+        // 2. 설정 저장 (window에 붙여서 HTML 버튼이 찾을 수 있게 함)
         window.saveConfig = async function() {
             const names = document.getElementById('namesInput').value;
             const date = document.getElementById('dateInput').value;
+            
             try {
-                await setDoc(doc(db, "config", "main"), { names: names, startDate: date }, { merge: true });
+                await setDoc(doc(db, "config", "main"), {
+                    names: names,
+                    startDate: date
+                }, { merge: true });
+                
                 const msg = document.getElementById('msg1');
                 msg.style.display = 'block';
                 setTimeout(() => { msg.style.display = 'none'; }, 2000);
-            } catch(e) { alert("저장 실패: " + e.message); }
+            } catch(e) {
+                alert("저장 실패: " + e.message);
+                console.error(e);
+            }
         }
 
-        // 2. 버킷리스트 추가
+        // 3. 버킷리스트 추가
         document.getElementById('addBucketBtn').addEventListener('click', async () => {
             const text = document.getElementById('bucketInput').value;
             if(!text) return;
+            
             try {
                 await addDoc(collection(db, "bucketlist"), {
-                    text: text, done: false, date: Date.now()
+                    text: text,
+                    done: false,
+                    date: Date.now()
                 });
                 alert("추가되었습니다!");
                 document.getElementById('bucketInput').value = '';
-            } catch(e) { alert("실패: " + e.message); }
+            } catch(e) {
+                alert("추가 실패: " + e.message);
+            }
         });
     </script>
 </body>
