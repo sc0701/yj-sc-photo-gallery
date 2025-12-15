@@ -65,6 +65,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+
+        // 여기서 앱을 시작합니다. (이 코드가 두 번 있으면 에러가 납니다)
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -82,7 +84,7 @@ const analytics = getAnalytics(app);
         }
         loadConfig();
 
-        // 2. 설정 저장 (window에 붙여서 HTML 버튼이 찾을 수 있게 함)
+        // 2. 설정 저장
         window.saveConfig = async function() {
             const names = document.getElementById('namesInput').value;
             const date = document.getElementById('dateInput').value;
