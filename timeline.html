@@ -6,39 +6,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 20px; background-color: #fff0f5; font-family: 'Gowun Dodum', sans-serif; }
+        body { margin: 0; padding: 20px; background-color: #fdfbf7; font-family: 'Gowun Dodum', sans-serif; }
         .container { max-width: 600px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 40px; position: relative; }
-        .home-btn { position: absolute; left: 0; top: 0; text-decoration: none; font-size: 24px; background: white; width: 40px; height: 40px; line-height: 40px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .timeline { border-left: 3px solid #ffb6c1; margin-left: 20px; padding-left: 30px; position: relative; }
+        
+        /* 헤더 스타일 */
+        .header { text-align: center; margin-bottom: 50px; position: relative; }
+        .home-btn { position: absolute; left: 0; top: 0; text-decoration: none; font-size: 24px; background: white; width: 40px; height: 40px; line-height: 40px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; }
+        .home-btn:hover { transform: scale(1.1); }
+        h1 { color: #333; margin: 0; letter-spacing: -1px; }
+
+        .timeline { border-left: 3px solid #e0e0e0; margin-left: 20px; padding-left: 40px; position: relative; }
+        
         .event { margin-bottom: 40px; position: relative; }
-        .event::before { content: '❤'; position: absolute; left: -39px; top: 0; background: white; width: 16px; height: 16px; text-align: center; line-height: 16px; border: 2px solid #ffb6c1; border-radius: 50%; font-size: 10px; color: #ffb6c1; }
-        .date { font-weight: bold; color: #ff6b6b; margin-bottom: 5px; font-size: 14px; }
-        .desc { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); color: #555; line-height: 1.5; }
+        
+        .icon-circle { 
+            position: absolute; left: -56px; top: 0; 
+            width: 32px; height: 32px; 
+            background: white; 
+            border: 3px solid #ffb6c1; /* 기본값 */
+            border-radius: 50%; 
+            text-align: center; line-height: 32px; 
+            font-size: 16px; 
+            z-index: 1;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .date { font-weight: bold; color: #888; margin-bottom: 8px; font-size: 13px; letter-spacing: 0.5px; }
+        
+        /* 말풍선 스타일의 카드 */
+        .desc { 
+            background: white; 
+            padding: 18px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            color: #444; 
+            line-height: 1.6; 
+            position: relative; 
+            border-left: 5px solid #ffb6c1; /* 기본값 */
+            transition: transform 0.2s;
+        }
+        .event:hover .desc { transform: translateY(-3px); }
+
+        /* --- 테마별 디자인 클래스 --- */
+        
+        /* 1. 기념일/사랑 (Pink) */
+        .theme-love .icon-circle { border-color: #ff6b6b; background: #fff0f0; }
+        .theme-love .desc { border-left-color: #ff6b6b; background: linear-gradient(to right, #fff0f0, #fff); }
+        .theme-love .date { color: #ff6b6b; }
+
+        /* 2. 문화/영화 (Purple) */
+        .theme-movie .icon-circle { border-color: #a29bfe; background: #f3f0ff; }
+        .theme-movie .desc { border-left-color: #a29bfe; }
+        .theme-movie .date { color: #6c5ce7; }
+
+        /* 3. 활동/운동 (Green/Orange) */
+        .theme-activity .icon-circle { border-color: #00b894; background: #e6fffa; }
+        .theme-activity .desc { border-left-color: #00b894; }
+        .theme-activity .date { color: #00b894; }
+        
+        /* 4. 여행/특별함 (Blue) */
+        .theme-trip .icon-circle { border-color: #0984e3; background: #e3f2fd; }
+        .theme-trip .desc { border-left-color: #0984e3; }
+        .theme-trip .date { color: #0984e3; }
+
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <a href="index.html" class="home-btn">🏠</a>
-            <h1>우리가 걸어온 길 👣</h1>
+            <h1>우리의 발자국 👣</h1>
         </div>
         <div class="timeline" id="timelineBox">
             </div>
     </div>
 
     <script>
-
+        // theme: 'love' (분홍), 'movie' (보라), 'activity' (초록), 'trip' (파랑)
+        // icon: 원하는 이모지
         const historyData = [
-            { date: "2025.12.06", text: "우리의 시작" },
+            { 
+                date: "2025.12.06", 
+                text: "우리가 시작한 날 ✨", 
+                theme: "love", 
+                icon: "❤" 
+            },
+            { 
+                date: "2025.12.20", 
+                text: "같이 본 첫 영화 <아바타3>!<br>팝콘도 먹고 손도 잡느라 바빴음 ㅎㅎ 🍿", 
+                theme: "movie", 
+                icon: "🎬" 
+            },
+            { 
+                date: "2025.12.21", 
+                text: "첫 동반 클라이밍 도전!<br>근육통...ㅠㅠ 💪", 
+                theme: "activity", 
+                icon: "🧗‍♂️" 
+            },
+            { 
+                date: "2025.12.25", 
+                text: "함께 보내는 첫 크리스마스 🎄<br>feat. 뮤지컬 라이프 오프 파이.", 
+                theme: "love", 
+            }
         ];
 
         const box = document.getElementById('timelineBox');
+        
         historyData.forEach(item => {
+            // theme이 없으면 기본값 love 적용
+            const themeClass = item.theme ? `theme-${item.theme}` : 'theme-love';
+            
             box.innerHTML += `
-                <div class="event">
-                    <div class="date">${item.date}</div>
-                    <div class="desc">${item.text}</div>
+                <div class="event ${themeClass}">
+                    <div class="icon-circle">${item.icon}</div>
+                    <div class="desc">
+                        <div class="date">${item.date}</div>
+                        ${item.text}
+                    </div>
                 </div>
             `;
         });
